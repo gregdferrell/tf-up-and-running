@@ -3,19 +3,19 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "bucket_terraform_state" {
-  bucket = "gregdferrell-tf-up-and-running-state-ch3"
+  bucket = "gregdferrell-tf-up-and-running-state"
 
   versioning {
     enabled = true
   }
 
   lifecycle {
-    prevent_destroy = true
+//    prevent_destroy = true
   }
 }
 
 resource "aws_dynamodb_table" "terraform_state_lock" {
-  name = "tf-up-and-running-app-state-ch3"
+  name = "tf-up-and-running-app-state"
   hash_key = "LockID"
   read_capacity = 1
   write_capacity = 1
