@@ -33,3 +33,7 @@ variable "cluster_min_size" {
 variable "cluster_max_size" {
   description = "the maximum number of EC2 instances in the ASG"
 }
+
+variable "enable_autoscaling" {
+  description = "boolean indicating whether or not to enable autoscaling up during the day and down at night"
+}
