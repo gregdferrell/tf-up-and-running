@@ -73,6 +73,8 @@ resource "aws_launch_configuration" "web_server_launch_config" {
   instance_type = "${var.instance_type}"
   security_groups = ["${aws_security_group.web_server_security_group.id}"]
 
+  name = "launch-config"
+
   user_data = "${data.template_file.user_data.rendered}"
 
   lifecycle {
@@ -81,19 +83,30 @@ resource "aws_launch_configuration" "web_server_launch_config" {
 }
 
 resource "aws_autoscaling_group" "web_server_auto_scaling_group" {
+  // Name depends on launch config name, so when launch config changes (with a deployment of a new AMI, for instance),
+  // the autoscaling group must update as well.
+  name = "${var.cluster_name}-${aws_launch_configuration.web_server_launch_config.name}-asg"
+
   launch_configuration = "${aws_launch_configuration.web_server_launch_config.id}"
   availability_zones = ["${data.aws_availability_zones.all.names}"]
 
   min_size = "${var.cluster_min_size}"
   max_size = "${var.cluster_max_size}"
+  // Make sure new instances are up and registered with the ELB before terraform destroys the old ASG
+  min_elb_capacity = "${var.cluster_min_size}"
 
   load_balancers = ["${aws_elb.web_server_load_balancer.name}"]
   health_check_type = "ELB"
 
   tag {
     key = "Name"
-    value = "${var.cluster_name}-asg"
+    value = "${var.cluster_name}"
     propagate_at_launch = true
+  }
+
+  // Create a new ASG before destroying
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -116,6 +129,10 @@ resource "aws_elb" "web_server_load_balancer" {
     timeout = 3
     interval = 30
     target = "HTTP:${var.web_server_port}/"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
