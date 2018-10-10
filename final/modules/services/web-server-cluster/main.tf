@@ -25,38 +25,47 @@ data "template_file" "user_data" {
 resource "aws_security_group" "web_server_security_group" {
   name = "${var.cluster_name}-sg-web-server"
 
-  ingress {
-    from_port = "${var.web_server_port}"
-    to_port = "${var.web_server_port}"
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  lifecycle {
+    create_before_destroy = true
   }
+}
+
+resource "aws_security_group_rule" "allow_http_inbound_web_server" {
+  type = "ingress"
+  security_group_id = "${aws_security_group.web_server_security_group.id}"
+
+  from_port = "${var.web_server_port}"
+  to_port = "${var.web_server_port}"
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group" "load_balancer_security_group" {
+  name = "${var.cluster_name}-sg-elb"
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "aws_security_group" "load_balancer_security_group" {
-  name = "${var.cluster_name}-sg-elb"
+resource "aws_security_group_rule" "allow_http_inbound_lb" {
+  type = "ingress"
+  security_group_id = "${aws_security_group.load_balancer_security_group.id}"
 
-  ingress {
-    from_port = "${var.lb_server_port}"
-    to_port = "${var.lb_server_port}"
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  from_port = "${var.lb_server_port}"
+  to_port = "${var.lb_server_port}"
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
 
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "allow_all_outbound" {
+  type = "egress"
+  security_group_id = "${aws_security_group.load_balancer_security_group.id}"
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  from_port = 0
+  to_port = 0
+  protocol = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 resource "aws_launch_configuration" "web_server_launch_config" {
