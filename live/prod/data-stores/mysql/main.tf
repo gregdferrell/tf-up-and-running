@@ -2,7 +2,7 @@
 terraform {
   backend "s3" {
     bucket = "gregdferrell-tf-up-and-running-state"
-    key = "state/stage/data-stores/mysql/terraform.tfstate"
+    key = "state/prod/data-stores/mysql/terraform.tfstate"
     region = "us-east-1"
     encrypt = true
     dynamodb_table = "tf-up-and-running-app-state"
@@ -16,11 +16,11 @@ provider "aws" {
 
 // Resources
 module "mysql" {
-  source = "../../../modules/data-stores/mysql"
+  source = "../../../../modules/data-stores/mysql"
 
   aws_region = "${var.aws_region}"
   db_instance_type = "db.t2.micro"
-  db_name = "MySqlStagingDb"
+  db_name = "MySqlProdDb"
   db_username = "admin"
-  db_password = "abcdefgh"
+  db_password = "ijklmnop"
 }

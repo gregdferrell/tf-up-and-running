@@ -16,7 +16,7 @@ provider "aws" {
 
 // Resources
 module "web_server_cluster" {
-  source = "../../../modules/services/web-server-cluster"
+  source = "../../../../modules/services/web-server-cluster"
 
   db_remote_state_bucket = "gregdferrell-tf-up-and-running-state"
   db_remote_state_key = "state/stage/data-stores/mysql/terraform.tfstate"
