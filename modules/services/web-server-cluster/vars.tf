@@ -26,6 +26,10 @@ variable "instance_type" {
   description = "the EC2 instance type to run"
 }
 
+variable "ami" {
+  description = "web server AMI"
+}
+
 variable "cluster_min_size" {
   description = "the minimum number of EC2 instances in the ASG"
 }

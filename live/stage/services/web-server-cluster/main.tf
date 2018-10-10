@@ -25,6 +25,7 @@ module "web_server_cluster" {
   web_server_port = 8080
   lb_server_port = 80
   instance_type = "t2.micro"
+  ami = "ami-40d28157"
   cluster_min_size = 2
   cluster_max_size = 2
   enable_autoscaling = false

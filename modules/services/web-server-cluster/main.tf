@@ -69,7 +69,7 @@ resource "aws_security_group_rule" "allow_all_outbound" {
 }
 
 resource "aws_launch_configuration" "web_server_launch_config" {
-  image_id = "ami-40d28157"
+  image_id = "${var.ami}"
   instance_type = "${var.instance_type}"
   security_groups = ["${aws_security_group.web_server_security_group.id}"]
 
